@@ -3,6 +3,7 @@ import axiosInstance from "@/services/axiosInstanse";
 import Api from "@/store/endpoints";
 import toast from "react-hot-toast";
 import { setItem } from "@/utils/Localstorage/storage";
+import { AxiosError } from "axios";
 
 // types
 interface LoginPayload {
@@ -14,7 +15,7 @@ interface User {
     id: string;
     name: string;
     email: string;
-    // ضيف أي properties تانية على حسب الـ API response
+
 }
 
 interface LoginResponse {
@@ -22,15 +23,20 @@ interface LoginResponse {
     user: User;
 }
 
+interface ApiErrorResponse {
+    meta?: string;
+    message?: string;
+}
+
 interface RejectPayload {
     errorMessage: string;
-    error: any;
+    error: AxiosError<ApiErrorResponse>;
 }
 
 export const signIn = createAsyncThunk<
-    LoginResponse,        // return type
-    LoginPayload,         // input type
-    { rejectValue: RejectPayload }  // error type
+    LoginResponse,
+    LoginPayload,
+    { rejectValue: RejectPayload }
 >(
     "auth/login",
     async ({ email, password }, { rejectWithValue }) => {
@@ -59,12 +65,16 @@ export const signIn = createAsyncThunk<
                 token,
                 user: userData,
             };
-        } catch (error: any ) {
+        } catch (error) {
+            const axiosError = error as AxiosError<ApiErrorResponse>;
             const errorMessage =
-                error?.response?.data?.meta || error?.message || "Login failed";
+                axiosError.response?.data?.meta ||
+                axiosError.response?.data?.message ||
+                axiosError.message ||
+                "Login failed";
             toast.error(errorMessage);
 
-            return rejectWithValue({ errorMessage, error });
+            return rejectWithValue({ errorMessage, error: axiosError });
         }
     }
 );

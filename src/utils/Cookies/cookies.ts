@@ -1,9 +1,9 @@
-import Cookies, { CookieAttributes } from "js-cookie";
+import Cookies from "js-cookie";
 
 export function setCookie<T>(
     key: string,
     value: T,
-    options: CookieAttributes = {}
+    options: Cookies.CookieAttributes = {}
 ): void {
     Cookies.set(
         key,
@@ -24,7 +24,7 @@ export function getCookie<T>(key: string): T | null {
 }
 
 
-export function removeCookie(key: string, options: CookieAttributes = {}): void {
+export function removeCookie(key: string, options: Cookies.CookieAttributes = {}): void {
     Cookies.remove(key, options);
 }
 
