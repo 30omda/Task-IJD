@@ -1,5 +1,5 @@
 /*
-	Installed from https://reactbits.dev/ts/tailwind/
+  Installed from https://reactbits.dev/ts/tailwind/
 */
 
 "use client";
@@ -9,14 +9,18 @@ import { InertiaPlugin } from "gsap/InertiaPlugin";
 
 gsap.registerPlugin(InertiaPlugin);
 
-const throttle = (func: (...args: any[]) => void, limit: number) => {
+function throttle<Args extends unknown[], R>(
+  func: (...args: Args) => R,
+  limit: number
+): (...args: Args) => R {
   let lastCall = 0;
-  return function (this: any, ...args: any[]) {
+  return function (this: unknown, ...args: Args): R {
     const now = performance.now();
     if (now - lastCall >= limit) {
       lastCall = now;
-      func.apply(this, args);
+      return func.apply(this, args);
     }
+    return func.apply(this, args);
   };
 };
 
@@ -184,9 +188,11 @@ const DotGrid: React.FC<DotGridProps> = ({
     let ro: ResizeObserver | null = null;
     if ("ResizeObserver" in window) {
       ro = new ResizeObserver(buildGrid);
-      wrapperRef.current && ro.observe(wrapperRef.current);
+      if (wrapperRef.current) {
+        ro.observe(wrapperRef.current);
+      }
     } else {
-      (window as Window).addEventListener("resize", buildGrid);
+      (window as Window & typeof globalThis).addEventListener("resize", buildGrid);
     }
     return () => {
       if (ro) ro.disconnect();

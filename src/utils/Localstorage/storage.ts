@@ -21,7 +21,7 @@ export function removeItem(key: string): void {
 
 
 export function clear(): void {
-    for (let key in localStorage) {
+    for (const key in localStorage) {
         if (key !== "selectedLanguage" && key !== "i18nextLng") {
             localStorage.removeItem(key);
         }

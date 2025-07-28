@@ -1,12 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { signIn } from "./authAcion";
-// import { getCookie, setCookie, removeCookie } from "@/utils/Cookies/cookies";
 
 import { getCookie, setCookie, removeCookie } from "@/utils/Cookies/cookies";
 
 import { toast } from "react-hot-toast";
 
-// Types
+
 interface User {
     id: string;
     name: string;
@@ -18,12 +17,6 @@ interface AuthState {
     token: string | null;
     isEmployee: boolean;
     isLoading: boolean;
-    error: string | null;
-}
-
-// Add type for rejected payload
-interface RejectedPayload {
-    errorMessage: string;
     error: string | null;
 }
 
@@ -75,16 +68,13 @@ const authSlice = createSlice({
                     setCookie("isEmployee", true, { path: "/" });
                 }
             )
-            .addCase(
-                signIn.rejected,
-                (state, action: PayloadAction<RejectedPayload | undefined>) => {
-                    state.user = null;
-                    state.token = null;
-                    state.isEmployee = false;
-                    state.isLoading = false;
-                    state.error = action.payload?.errorMessage || "Login failed";
-                }
-            );
+            .addCase(signIn.rejected, (state, action) => {
+                state.user = null;
+                state.token = null;
+                state.isEmployee = false;
+                state.isLoading = false;
+                state.error = action.payload?.errorMessage || action.error.message || "Login failed";
+            });
     },
 });
 
